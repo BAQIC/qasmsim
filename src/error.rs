@@ -240,7 +240,7 @@ impl<'src> From<SrcAndErr<'src, ParseError>> for QasmSimError<'src> {
                     expected: Vec::new(),
                 }
             }
-            ParseError::UnrecognizedEOF { location, expected } => {
+            ParseError::UnrecognizedEof { location, expected } => {
                 let (source, lineno, startpos, endpos) = extract_line(location.0, None, input);
                 QasmSimError::UnexpectedEOF {
                     source,
