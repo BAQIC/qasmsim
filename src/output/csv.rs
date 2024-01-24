@@ -3,8 +3,8 @@ use std::io::{self, Write};
 use std::iter::FromIterator;
 use std::path::PathBuf;
 
-use qasmsim::statevector::StateVector;
-use qasmsim::{Execution, ExecutionTimes, Histogram};
+use crate::statevector::StateVector;
+use crate::{Execution, ExecutionTimes, Histogram};
 
 use crate::options::Options;
 

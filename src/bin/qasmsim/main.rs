@@ -1,12 +1,11 @@
-mod options;
-mod output;
-
 use std::fs;
 use std::io::{self, Read};
 use std::path::PathBuf;
 
 use structopt::StructOpt;
 
+use qasmsim::options;
+use qasmsim::output;
 use qasmsim::Execution;
 
 fn main() -> io::Result<()> {

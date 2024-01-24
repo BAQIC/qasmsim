@@ -58,21 +58,13 @@
 //! ARGS:
 //!     <source>    QASM program file, read from stdin if not present
 //! ```
-
-#[cfg(not(target_arch = "wasm32"))]
-#[cfg_attr(not(target_arch = "wasm32"), macro_use)]
+#[macro_use]
 pub mod error;
-
-#[cfg(not(target_arch = "wasm32"))]
 pub mod grammar;
-
-#[cfg(not(target_arch = "wasm32"))]
-mod linker;
-
-#[cfg(not(target_arch = "wasm32"))]
+pub mod options;
+pub mod output;
 pub mod statevector;
 
-#[cfg(not(target_arch = "wasm32"))]
 pub use crate::{
     arch::native::{
         get_gate_info, parse_and_link, run, simulate, simulate_with_shots, Execution,
@@ -83,26 +75,11 @@ pub use crate::{
     semantics::QasmType,
 };
 
-#[cfg(target_arch = "wasm32")]
-#[cfg_attr(target_arch = "wasm32", macro_use)]
-mod error;
-
-#[cfg(target_arch = "wasm32")]
-mod grammar;
-
-#[cfg(target_arch = "wasm32")]
-mod linker;
-
-#[cfg(target_arch = "wasm32")]
-mod statevector;
-
-#[cfg(target_arch = "wasm32")]
-pub use crate::arch::wasm::run;
-
 mod api;
 mod arch;
 mod complex;
 mod interpreter;
+mod linker;
 mod qe;
 mod random;
 mod semantics;
