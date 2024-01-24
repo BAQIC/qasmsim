@@ -8,6 +8,7 @@ use crate::{Execution, ExecutionTimes, Histogram};
 
 use crate::options::Options;
 
+/// Writes the `msg` in the `buffer`
 pub fn print(path: &mut PathBuf, result: &Execution, options: &Options) {
     // TODO: Add error handling for path operations.
     let prefix = path

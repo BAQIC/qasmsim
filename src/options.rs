@@ -1,7 +1,10 @@
+//! This module contains the definition of the command line options.
+
 use std::path::PathBuf;
 
 use structopt::StructOpt;
 
+/// Output options.
 #[derive(Debug, Clone, PartialEq, Eq, StructOpt, Hash)]
 #[structopt(
     name = "qasmsim",

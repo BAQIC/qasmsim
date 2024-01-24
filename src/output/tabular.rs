@@ -31,6 +31,7 @@ macro_rules! vvprintln {
     }};
 }
 
+/// Writes the `msg` in the `buffer`
 pub fn print<W>(buffer: &mut W, result: &Execution, options: &Options)
 where
     W: Write,
@@ -38,6 +39,7 @@ where
     do_print(buffer, result, options).expect("writes in stdout");
 }
 
+/// Writes the `msg` in the `buffer`
 fn do_print<W>(buffer: &mut W, result: &Execution, options: &Options) -> io::Result<()>
 where
     W: Write,
