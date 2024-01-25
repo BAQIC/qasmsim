@@ -266,3 +266,59 @@ fn test_conditional() {
     assert_eq!(*result.memory().get("c").unwrap(), 0b10);
     assert_eq!(*result.memory().get("d").unwrap(), 0b01);
 }
+
+#[test]
+fn test_print_json() {
+    let source = "
+    OPENQASM 2.0;
+    include \"qelib1.inc\";
+    qreg q[2];
+    creg c[2];
+    x q;
+    measure q -> c;
+    ";
+
+    let option = qasmsim::options::Options {
+        format: qasmsim::options::Format::Json,
+        shots: None,
+        times: false,
+        ..Default::default()
+    };
+
+    let result = qasmsim::run(source, option.shots).unwrap();
+    let output = qasmsim::print_result(&result, &option);
+    assert_eq!(
+        output,
+        r#"{
+  "Memory": {
+    "c": {
+      "Bin value": "0b11",
+      "Hex value": "0x3",
+      "Int value": 3
+    }
+  },
+  "State": {
+    "0": {
+      "Imaginary": "0.000000",
+      "Probability": "0.000000",
+      "Real": "0.000000"
+    },
+    "1": {
+      "Imaginary": "0.000000",
+      "Probability": "0.000000",
+      "Real": "0.000000"
+    },
+    "2": {
+      "Imaginary": "0.000000",
+      "Probability": "0.000000",
+      "Real": "0.000000"
+    },
+    "3": {
+      "Imaginary": "0.000000",
+      "Probability": "1.000000",
+      "Real": "1.000000"
+    }
+  }
+}"#
+    );
+}

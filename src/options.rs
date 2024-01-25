@@ -1,8 +1,21 @@
 //! This module contains the definition of the command line options.
 
+/// Output format.
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+pub enum Format {
+    /// Tabular format.
+    Tabular,
+
+    /// JSON format.
+    Json,
+}
+
 /// Output options.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Options {
+    /// Output format.
+    pub format: Format,
+
     /// Prints the binary representation of the values.
     pub binary: bool,
 
@@ -28,6 +41,7 @@ pub struct Options {
 impl Default for Options {
     fn default() -> Self {
         Self {
+            format: Format::Tabular,
             binary: true,
             hexadecimal: true,
             integer: true,

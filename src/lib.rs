@@ -62,7 +62,6 @@
 pub mod error;
 pub mod grammar;
 pub mod options;
-pub mod output;
 pub mod statevector;
 
 pub use crate::{
@@ -72,6 +71,7 @@ pub use crate::{
     },
     error::QasmSimError,
     interpreter::{Computation, Histogram},
+    output::output::{print_info, print_result},
     semantics::QasmType,
 };
 
@@ -80,6 +80,7 @@ mod arch;
 mod complex;
 mod interpreter;
 mod linker;
+mod output;
 mod qe;
 mod random;
 mod semantics;

@@ -25,7 +25,10 @@ pub fn print_info(
 /// print result.
 pub fn print_result(result: &Execution, options: &options::Options) -> String {
     let mut output = String::new();
-    output::tabular::print(&mut output, result, options);
+    match options.format {
+        options::Format::Tabular => output::tabular::print(&mut output, result, options),
+        options::Format::Json => output::json::print(&mut output, result, options),
+    }
 
     output
 }
