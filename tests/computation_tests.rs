@@ -292,9 +292,11 @@ fn test_print_json() {
         r#"{
   "Memory": {
     "c": {
-      "Bin value": "0b11",
-      "Hex value": "0x3",
-      "Int value": 3
+      "0": {
+        "Bin value": "0b11",
+        "Hex value": "0x3",
+        "Int value": 3
+      }
     }
   },
   "State": {

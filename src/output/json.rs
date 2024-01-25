@@ -89,19 +89,20 @@ fn print_memory_summary(
     };
 
     for (key, hist) in histogram {
-        for (value, count) in hist.iter() {
-            json[key] = json!({});
+        json[key] = json!({});
+        for (idx, (value, count)) in hist.iter().enumerate() {
+            json[key][format!("{}", idx)] = json!({});
             if integer {
-                json[key]["Int value"] = json!(value);
+                json[key][format!("{}", idx)]["Int value"] = json!(value);
             }
             if hexadecimal {
-                json[key]["Hex value"] = json!(format!("0x{:x}", value));
+                json[key][format!("{}", idx)]["Hex value"] = json!(format!("0x{:x}", value));
             }
             if binary {
-                json[key]["Bin value"] = json!(format!("0b{:b}", value));
+                json[key][format!("{}", idx)]["Bin value"] = json!(format!("0b{:b}", value));
             }
             if !omit_count {
-                json[key]["Count"] = json!(count);
+                json[key][format!("{}", idx)]["Count"] = json!(count);
             }
         }
     }
