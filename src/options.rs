@@ -3,9 +3,6 @@
 /// Output options.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Options {
-    /// Verbosity of the output.
-    pub verbose: bool,
-
     /// Prints the binary representation of the values.
     pub binary: bool,
 
@@ -26,23 +23,18 @@ pub struct Options {
 
     /// Specify the number of simulations.
     pub shots: Option<usize>,
-
-    /// Show gate-related information.
-    pub info: Option<String>,
 }
 
 impl Default for Options {
     fn default() -> Self {
         Self {
-            verbose: false,
-            binary: false,
-            hexadecimal: false,
+            binary: true,
+            hexadecimal: true,
             integer: true,
-            statevector: false,
-            probabilities: false,
-            times: false,
+            statevector: true,
+            probabilities: true,
+            times: true,
             shots: None,
-            info: None,
         }
     }
 }

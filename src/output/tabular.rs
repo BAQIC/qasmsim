@@ -12,11 +12,7 @@ use crate::options::Options;
 /// Writes the `msg` in the `buffer` if `options.verbose` is greater than 0.
 macro_rules! vvprint {
     ($options:expr, $buffer:expr, $msg:expr) => {{
-        if $options.verbose {
-            write!($buffer, $msg)
-        } else {
-            Ok(())
-        }
+        write!($buffer, $msg)
     }};
 }
 
