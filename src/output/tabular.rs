@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use std::io::{self, Write};
+use std::fmt::{self, Write};
 use std::iter::FromIterator;
 
 use prettytable::{cell, format, row, Table};
@@ -12,7 +12,7 @@ use crate::options::Options;
 /// Writes the `msg` in the `buffer` if `options.verbose` is greater than 0.
 macro_rules! vvprint {
     ($options:expr, $buffer:expr, $msg:expr) => {{
-        if $options.verbose > 0 {
+        if $options.verbose {
             write!($buffer, $msg)
         } else {
             Ok(())
@@ -40,7 +40,7 @@ where
 }
 
 /// Writes the `msg` in the `buffer`
-fn do_print<W>(buffer: &mut W, result: &Execution, options: &Options) -> io::Result<()>
+fn do_print<W>(buffer: &mut W, result: &Execution, options: &Options) -> fmt::Result
 where
     W: Write,
 {
@@ -82,11 +82,7 @@ where
     Ok(())
 }
 
-fn print_memory<W>(
-    buffer: &mut W,
-    memory: &HashMap<String, u64>,
-    options: &Options,
-) -> io::Result<()>
+fn print_memory<W>(buffer: &mut W, memory: &HashMap<String, u64>, options: &Options) -> fmt::Result
 where
     W: Write,
 {
@@ -98,7 +94,7 @@ where
     print_memory_summary(buffer, &histogram, options, true)
 }
 
-fn print_histogram<W>(buffer: &mut W, histogram: &Histogram, options: &Options) -> io::Result<()>
+fn print_histogram<W>(buffer: &mut W, histogram: &Histogram, options: &Options) -> fmt::Result
 where
     W: Write,
 {
@@ -110,7 +106,7 @@ fn print_memory_summary<W>(
     histogram: &Histogram,
     options: &Options,
     omit_count: bool,
-) -> io::Result<()>
+) -> fmt::Result
 where
     W: Write,
 {
@@ -167,7 +163,7 @@ fn print_state<W>(
     statevector: &StateVector,
     probabilities: &[f64],
     options: &Options,
-) -> io::Result<()>
+) -> fmt::Result
 where
     W: Write,
 {
@@ -209,7 +205,7 @@ where
     write!(buffer, "{}", table)
 }
 
-fn print_times<W>(buffer: &mut W, times: &ExecutionTimes) -> io::Result<()>
+fn print_times<W>(buffer: &mut W, times: &ExecutionTimes) -> fmt::Result
 where
     W: Write,
 {
