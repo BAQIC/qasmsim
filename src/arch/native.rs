@@ -83,7 +83,7 @@ impl From<(u128, u128)> for ExecutionTimes {
 pub struct Execution {
     statevector: StateVector,
     probabilities: Vec<f64>,
-    memory: HashMap<String, u64>,
+    memory: HashMap<String, (u64, usize)>,
     histogram: Option<Histogram>,
     times: ExecutionTimes,
 }
@@ -93,7 +93,7 @@ impl Execution {
     pub fn new(
         statevector: StateVector,
         probabilities: Vec<f64>,
-        memory: HashMap<String, u64>,
+        memory: HashMap<String, (u64, usize)>,
         histogram: Option<Histogram>,
         times: ExecutionTimes,
     ) -> Self {
@@ -117,7 +117,7 @@ impl Execution {
     }
 
     /// Return an associative map with classical names and the classical outcomes.
-    pub fn memory(&self) -> &HashMap<String, u64> {
+    pub fn memory(&self) -> &HashMap<String, (u64, usize)> {
         &self.memory
     }
 

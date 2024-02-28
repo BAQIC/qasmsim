@@ -6,7 +6,8 @@ use serde::{Deserialize, Serialize};
 use crate::statevector::StateVector;
 
 /// Map classical registers with values and number of outcomes.
-pub type Histogram = HashMap<String, Vec<(u64, usize)>>;
+/// register name -> (Vector of (value, count), register size)
+pub type Histogram = HashMap<String, (Vec<(u64, usize)>, usize)>;
 
 /// Represent the result of a simulation.
 ///
@@ -24,7 +25,7 @@ pub type Histogram = HashMap<String, Vec<(u64, usize)>>;
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Computation {
     statevector: StateVector,
-    memory: HashMap<String, u64>,
+    memory: HashMap<String, (u64, usize)>,
     probabilities: Vec<f64>,
     histogram: Option<Histogram>,
 }
@@ -34,7 +35,7 @@ impl Computation {
     ///
     /// Probabilities are computed from the state-vector.
     pub fn new(
-        memory: HashMap<String, u64>,
+        memory: HashMap<String, (u64, usize)>,
         statevector: StateVector,
         histogram: Option<Histogram>,
     ) -> Self {
@@ -52,7 +53,7 @@ impl Computation {
     }
 
     /// Return an associative map with classical names and the classical outcomes.
-    pub fn memory(&self) -> &HashMap<String, u64> {
+    pub fn memory(&self) -> &HashMap<String, (u64, usize)> {
         &self.memory
     }
 
@@ -77,14 +78,15 @@ impl HistogramBuilder {
         Default::default()
     }
 
-    pub fn update(&mut self, memory: &HashMap<String, u64>) {
+    pub fn update(&mut self, memory: &HashMap<String, (u64, usize)>) {
         for (key, current_value) in memory {
             if !self.histogram.contains_key(key) {
-                self.histogram.insert(key.clone(), Vec::new());
+                self.histogram
+                    .insert(key.clone(), (Vec::new(), current_value.1));
             }
-            let values = self.histogram.get_mut(key).expect("get values for key");
-            match values.binary_search_by_key(&current_value, |(v, _)| v) {
-                Err(idx) => values.insert(idx, (*current_value, 1)),
+            let values = &mut self.histogram.get_mut(key).expect("get values for key").0;
+            match values.binary_search_by_key(&current_value.0, |(v, _)| *v) {
+                Err(idx) => values.insert(idx, (current_value.0, 1)),
                 Ok(found) => values[found].1 += 1,
             }
         }
@@ -111,51 +113,54 @@ mod test {
     #[test]
     fn test_histogram_builder_one_update() {
         let mut builder = HistogramBuilder::new();
-        builder.update(&HashMap::from_iter(vec![("a".into(), 1)]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (1, 1))]));
         let histogram = builder.histogram();
         assert_eq!(
             histogram,
-            HashMap::from_iter(vec![("a".into(), vec![(1, 1)])])
+            HashMap::from_iter(vec![("a".into(), (vec![(1, 1)], 1))])
         );
     }
 
     #[test]
     fn test_histogram_builder_couple_of_updates() {
         let mut builder = HistogramBuilder::new();
-        builder.update(&HashMap::from_iter(vec![("a".into(), 1)]));
-        builder.update(&HashMap::from_iter(vec![("a".into(), 1)]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (1, 1))]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (1, 1))]));
         let histogram = builder.histogram();
         assert_eq!(
             histogram,
-            HashMap::from_iter(vec![("a".into(), vec![(1, 2)])])
+            HashMap::from_iter(vec![("a".into(), (vec![(1, 2)], 1))])
         );
     }
 
     #[test]
     fn test_histogram_builder_couple_of_registers() {
         let mut builder = HistogramBuilder::new();
-        builder.update(&HashMap::from_iter(vec![("a".into(), 1)]));
-        builder.update(&HashMap::from_iter(vec![("b".into(), 1)]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (1, 1))]));
+        builder.update(&HashMap::from_iter(vec![("b".into(), (1, 1))]));
         let histogram = builder.histogram();
         assert_eq!(
             histogram,
-            HashMap::from_iter(vec![("a".into(), vec![(1, 1)]), ("b".into(), vec![(1, 1)])])
+            HashMap::from_iter(vec![
+                ("a".into(), (vec![(1, 1)], 1)),
+                ("b".into(), (vec![(1, 1)], 1))
+            ])
         );
     }
 
     #[test]
     fn test_histogram_builder_different_values() {
         let mut builder = HistogramBuilder::new();
-        builder.update(&HashMap::from_iter(vec![("a".into(), 5)]));
-        builder.update(&HashMap::from_iter(vec![("b".into(), 4)]));
-        builder.update(&HashMap::from_iter(vec![("a".into(), 3)]));
-        builder.update(&HashMap::from_iter(vec![("b".into(), 2)]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (5, 3))]));
+        builder.update(&HashMap::from_iter(vec![("b".into(), (4, 3))]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (3, 3))]));
+        builder.update(&HashMap::from_iter(vec![("b".into(), (2, 3))]));
         let histogram = builder.histogram();
         assert_eq!(
             histogram,
             HashMap::from_iter(vec![
-                ("a".into(), vec![(3, 1), (5, 1)]),
-                ("b".into(), vec![(2, 1), (4, 1)])
+                ("a".into(), (vec![(3, 1), (5, 1)], 3)),
+                ("b".into(), (vec![(2, 1), (4, 1)], 3))
             ])
         );
     }
@@ -163,16 +168,16 @@ mod test {
     #[test]
     fn test_histogram_builder_different_repeated_values() {
         let mut builder = HistogramBuilder::new();
-        builder.update(&HashMap::from_iter(vec![("a".into(), 5)]));
-        builder.update(&HashMap::from_iter(vec![("b".into(), 4)]));
-        builder.update(&HashMap::from_iter(vec![("a".into(), 5)]));
-        builder.update(&HashMap::from_iter(vec![("b".into(), 2)]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (5, 3))]));
+        builder.update(&HashMap::from_iter(vec![("b".into(), (4, 3))]));
+        builder.update(&HashMap::from_iter(vec![("a".into(), (5, 3))]));
+        builder.update(&HashMap::from_iter(vec![("b".into(), (2, 3))]));
         let histogram = builder.histogram();
         assert_eq!(
             histogram,
             HashMap::from_iter(vec![
-                ("a".into(), vec![(5, 2)]),
-                ("b".into(), vec![(2, 1), (4, 1)])
+                ("a".into(), (vec![(5, 2)], 3)),
+                ("b".into(), (vec![(2, 1), (4, 1)], 3))
             ])
         );
     }

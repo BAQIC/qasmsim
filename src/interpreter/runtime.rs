@@ -1,7 +1,6 @@
 use std::collections::{HashMap, VecDeque};
 use std::error;
 use std::fmt;
-use std::iter::FromIterator;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -122,7 +121,8 @@ struct Runtime<'program> {
     macro_stack: VecDeque<BindingMappings>,
     semantics: Semantics,
     statevector: StateVector,
-    memory: HashMap<String, u64>,
+    // rigister name, (int value, size of the register)
+    memory: HashMap<String, (u64, usize)>,
     location: Option<&'program Location>,
 }
 
@@ -152,7 +152,7 @@ impl<'src, 'program> Runtime<'program> {
         self.memory.clear();
         for register in self.semantics.register_table.values() {
             if register.1 == RegisterType::C {
-                self.memory.insert(register.0.clone(), 0_u64);
+                self.memory.insert(register.0.clone(), (0_u64, register.2));
             }
         }
     }
@@ -176,7 +176,7 @@ impl<'src, 'program> Runtime<'program> {
                             .expect("after `assert_is_classical_register()`, must exist"),
                         _ => unreachable!("cannot index a register inside the condition"),
                     };
-                    if value == test {
+                    if &value.0 == test {
                         self.apply_quantum_operation(operation)?;
                     }
                 }
@@ -314,8 +314,10 @@ impl<'src, 'program> Runtime<'program> {
             .memory
             .get(classical_register_name)
             .expect("after `apply_measurement()`, get the entry"));
-        self.memory
-            .insert(classical_register_name.into(), prev_value + value);
+        self.memory.insert(
+            classical_register_name.into(),
+            (prev_value.0 + value, prev_value.1),
+        );
 
         Ok(())
     }
@@ -669,6 +671,7 @@ pub fn simulate_with_shots(program: &ast::OpenQasmProgram, shots: usize) -> Resu
         runtime.apply_gates(&program.program)?;
         histogram_builder.update(&runtime.memory);
     }
+
     Ok(Computation::new(
         runtime.memory,
         runtime.statevector,

@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 use std::fmt::{self, Write};
-use std::iter::FromIterator;
 
-use serde_json::{self, json, Value};
+use serde_json::{json, Value};
 
 use crate::statevector::StateVector;
 use crate::{Execution, ExecutionTimes, Histogram};
@@ -57,13 +56,13 @@ where
 
 fn print_memory(
     value: &mut Value,
-    memory: &HashMap<String, u64>,
+    memory: &HashMap<String, (u64, usize)>,
     options: &Options,
 ) -> fmt::Result {
     let histogram = HashMap::from_iter(
         memory
             .iter()
-            .map(|(key, value)| (key.clone(), vec![(*value, 1)])),
+            .map(|(key, value)| (key.clone(), (vec![(value.0, 1)], value.1))),
     );
     print_memory_summary(value, &histogram, options, true)
 }
@@ -90,8 +89,9 @@ fn print_memory_summary(
 
     for (key, hist) in histogram {
         json[key] = json!({});
-        for (idx, (value, count)) in hist.iter().enumerate() {
+        for (idx, (value, count)) in hist.0.iter().enumerate() {
             json[key][format!("{}", idx)] = json!({});
+            json[key][format!("{}", idx)]["Register length"] = json!(hist.1);
             if integer {
                 json[key][format!("{}", idx)]["Int value"] = json!(value);
             }
@@ -99,7 +99,8 @@ fn print_memory_summary(
                 json[key][format!("{}", idx)]["Hex value"] = json!(format!("0x{:x}", value));
             }
             if binary {
-                json[key][format!("{}", idx)]["Bin value"] = json!(format!("0b{:b}", value));
+                json[key][format!("{}", idx)]["Bin value"] =
+                    json!(format!("0b{:0width$b}", value, width = hist.1));
             }
             if !omit_count {
                 json[key][format!("{}", idx)]["Count"] = json!(count);

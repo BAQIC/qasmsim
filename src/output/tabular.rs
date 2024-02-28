@@ -1,6 +1,5 @@
 use std::collections::HashMap;
 use std::fmt::{self, Write};
-use std::iter::FromIterator;
 
 use prettytable::{cell, format, row, Table};
 
@@ -78,14 +77,18 @@ where
     Ok(())
 }
 
-fn print_memory<W>(buffer: &mut W, memory: &HashMap<String, u64>, options: &Options) -> fmt::Result
+fn print_memory<W>(
+    buffer: &mut W,
+    memory: &HashMap<String, (u64, usize)>,
+    options: &Options,
+) -> fmt::Result
 where
     W: Write,
 {
     let histogram = HashMap::from_iter(
         memory
             .iter()
-            .map(|(key, value)| (key.clone(), vec![(*value, 1)])),
+            .map(|(key, value)| (key.clone(), (vec![(value.0, 1)], value.1))),
     );
     print_memory_summary(buffer, &histogram, options, true)
 }
@@ -118,6 +121,7 @@ where
     };
 
     let mut titles = row![c -> "Name"];
+    titles.add_cell(cell!(c -> "Register length"));
     if integer {
         titles.add_cell(cell!(c -> "Int value"));
     }
@@ -133,8 +137,9 @@ where
     table.set_titles(titles);
 
     for (key, hist) in histogram {
-        for (idx, (value, count)) in hist.iter().enumerate() {
+        for (idx, (value, count)) in hist.0.iter().enumerate() {
             let mut row = row![r -> if idx == 0 { key } else { "" }];
+            row.add_cell(cell!(r -> hist.1));
             if integer {
                 row.add_cell(cell!(r -> value));
             }

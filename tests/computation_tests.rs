@@ -225,7 +225,7 @@ fn test_measurements() {
     for (index, (source, expected_result)) in subtests.iter().enumerate() {
         let result = &qasmsim::run(source, None).unwrap();
         println!("Using source sample #{}", index);
-        assert_eq!(*result.memory().get("c").unwrap(), *expected_result);
+        assert_eq!(*result.memory().get("c").unwrap(), (*expected_result, 2));
     }
 }
 
@@ -243,9 +243,9 @@ fn test_all_classical_memory_is_displayed() {
   ";
     let result = &qasmsim::run(source, None).unwrap();
     assert_eq!(result.memory().len(), 3);
-    assert_eq!(*result.memory().get("c").unwrap(), 0b11);
-    assert_eq!(*result.memory().get("d").unwrap(), 0b0);
-    assert_eq!(*result.memory().get("e").unwrap(), 0b0);
+    assert_eq!(*result.memory().get("c").unwrap(), (0b11, 2));
+    assert_eq!(*result.memory().get("d").unwrap(), (0b0, 2));
+    assert_eq!(*result.memory().get("e").unwrap(), (0b0, 2));
 }
 
 #[test]
@@ -263,8 +263,8 @@ fn test_conditional() {
   ";
     let result = &qasmsim::run(source, None).unwrap();
     assert_eq!(result.memory().len(), 2);
-    assert_eq!(*result.memory().get("c").unwrap(), 0b10);
-    assert_eq!(*result.memory().get("d").unwrap(), 0b01);
+    assert_eq!(*result.memory().get("c").unwrap(), (0b10, 2));
+    assert_eq!(*result.memory().get("d").unwrap(), (0b01, 2));
 }
 
 #[test]
@@ -295,7 +295,8 @@ fn test_print_json() {
       "0": {
         "Bin value": "0b11",
         "Hex value": "0x3",
-        "Int value": 3
+        "Int value": 3,
+        "Register length": 2
       }
     }
   },
