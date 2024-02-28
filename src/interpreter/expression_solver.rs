@@ -42,7 +42,6 @@ impl<'bindings> ExpressionSolver<'bindings> {
 #[cfg(test)]
 mod test {
     use std::f64::consts::PI;
-    use std::iter::FromIterator;
 
     use super::*;
     use crate::grammar::ast::*;

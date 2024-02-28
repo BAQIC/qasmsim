@@ -268,7 +268,6 @@ mod test {
     use indoc::indoc;
 
     use super::*;
-    use std::iter::FromIterator;
 
     use crate::grammar::parse_program;
 

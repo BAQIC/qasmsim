@@ -10,7 +10,7 @@
 //! for enabling the users to experiment with performing code manipulations at
 //! the abstract level.
 
-use lalrpop_util::{self, lalrpop_mod};
+use lalrpop_util::lalrpop_mod;
 
 pub mod ast;
 pub mod lexer;

@@ -99,7 +99,6 @@ impl HistogramBuilder {
 
 #[cfg(test)]
 mod test {
-    use std::iter::FromIterator;
 
     use super::*;
 

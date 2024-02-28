@@ -1,6 +1,5 @@
 //! Contain utilities for representing the internal state of a quantum system.
 use std::f64;
-use std::iter::FromIterator;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};

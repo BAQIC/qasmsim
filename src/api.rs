@@ -1,5 +1,4 @@
 use std::collections::HashMap;
-use std::iter::FromIterator;
 
 use crate::error::QasmSimError;
 use crate::grammar::{ast, parse_program};

@@ -24,7 +24,6 @@ impl<'bindings> ArgumentSolver<'bindings> {
 #[cfg(test)]
 mod test {
     use super::*;
-    use std::iter::FromIterator;
 
     #[test]
     fn test_replace_formal_parameter_with_actual_parameter() {

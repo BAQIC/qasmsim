@@ -98,12 +98,10 @@ impl Linker {
 
 #[cfg(test)]
 mod tests {
-    use std::iter::FromIterator;
 
     use indoc::indoc;
 
     use crate::grammar::{ast::Span, parse_program};
-    use crate::linker::Location;
 
     use super::*;
 
