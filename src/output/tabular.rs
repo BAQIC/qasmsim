@@ -147,7 +147,7 @@ where
                 row.add_cell(cell!(r -> format!("0x{:x}", value)));
             }
             if binary {
-                row.add_cell(cell!(r -> format!("0b{:b}", value)));
+                row.add_cell(cell!(r -> format!("0b{:0width$b}", value, width = hist.1)));
             }
             if !omit_count {
                 row.add_cell(cell!(r -> count));
