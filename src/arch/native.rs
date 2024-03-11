@@ -3,9 +3,6 @@
 use std::collections::HashMap;
 use std::convert;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 use crate::{api, statevector::StateVector};
 
 use crate::error::QasmSimError;
@@ -83,9 +80,10 @@ impl From<(u128, u128)> for ExecutionTimes {
 pub struct Execution {
     statevector: StateVector,
     probabilities: Vec<f64>,
-    memory: HashMap<String, (u64, usize)>,
+    memory: HashMap<String, (u64, usize, usize)>,
     histogram: Option<Histogram>,
     times: ExecutionTimes,
+    stats: Option<HashMap<String, usize>>,
 }
 
 impl Execution {
@@ -93,9 +91,10 @@ impl Execution {
     pub fn new(
         statevector: StateVector,
         probabilities: Vec<f64>,
-        memory: HashMap<String, (u64, usize)>,
+        memory: HashMap<String, (u64, usize, usize)>,
         histogram: Option<Histogram>,
         times: ExecutionTimes,
+        stats: Option<HashMap<String, usize>>,
     ) -> Self {
         Execution {
             statevector,
@@ -103,6 +102,7 @@ impl Execution {
             memory,
             histogram,
             times,
+            stats,
         }
     }
 
@@ -117,7 +117,7 @@ impl Execution {
     }
 
     /// Return an associative map with classical names and the classical outcomes.
-    pub fn memory(&self) -> &HashMap<String, (u64, usize)> {
+    pub fn memory(&self) -> &HashMap<String, (u64, usize, usize)> {
         &self.memory
     }
 
@@ -129,6 +129,11 @@ impl Execution {
     /// Return the time spent in parsing and performing the simulation.
     pub fn times(&self) -> &ExecutionTimes {
         &self.times
+    }
+
+    /// Return the statistics of the simulation.
+    pub fn stats(&self) -> &Option<HashMap<String, usize>> {
+        &self.stats
     }
 }
 
@@ -144,6 +149,7 @@ impl convert::From<(Computation, u128, u128)> for Execution {
                 parsing_time,
                 simulation_time,
             },
+            stats: computation.stats().clone(),
         }
     }
 }

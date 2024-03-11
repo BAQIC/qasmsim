@@ -1,4 +1,5 @@
 #![warn(missing_docs)]
+#![allow(dead_code)]
 #![doc(html_root_url = "https://docs.rs/qasmsim/1.3.1")]
 //! The `qasmsim` library includes a
 //! [OPENQASM 2.0](https://github.com/Qiskit/openqasm/blob/master/spec-human/)

@@ -1,6 +1,7 @@
 use std::collections::{HashMap, VecDeque};
 use std::error;
 use std::fmt;
+use std::hash::Hash;
 
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
@@ -121,8 +122,8 @@ struct Runtime<'program> {
     macro_stack: VecDeque<BindingMappings>,
     semantics: Semantics,
     statevector: StateVector,
-    // rigister name, (int value, size of the register)
-    memory: HashMap<String, (u64, usize)>,
+    // rigister name, (int value, size of the register, location of creg decl)
+    memory: HashMap<String, (u64, usize, usize)>,
     location: Option<&'program Location>,
 }
 
@@ -152,7 +153,8 @@ impl<'src, 'program> Runtime<'program> {
         self.memory.clear();
         for register in self.semantics.register_table.values() {
             if register.1 == RegisterType::C {
-                self.memory.insert(register.0.clone(), (0_u64, register.2));
+                self.memory
+                    .insert(register.0.clone(), (0_u64, register.2, register.3 .0));
             }
         }
     }
@@ -316,7 +318,7 @@ impl<'src, 'program> Runtime<'program> {
             .expect("after `apply_measurement()`, get the entry"));
         self.memory.insert(
             classical_register_name.into(),
-            (prev_value.0 + value, prev_value.1),
+            (prev_value.0 + value, prev_value.1, prev_value.2),
         );
 
         Ok(())
@@ -618,7 +620,12 @@ pub fn simulate(program: &ast::OpenQasmProgram) -> Result<Computation> {
     let semantics = extract_semantics(program)?;
     let mut runtime = Runtime::new(semantics);
     runtime.apply_gates(&program.program)?;
-    Ok(Computation::new(runtime.memory, runtime.statevector, None))
+    Ok(Computation::new(
+        runtime.memory,
+        runtime.statevector,
+        None,
+        None,
+    ))
 }
 
 /// Perform `shots` number of simulations of the parsed proram `program`.
@@ -675,6 +682,7 @@ pub fn simulate_with_shots(program: &ast::OpenQasmProgram, shots: usize) -> Resu
     Ok(Computation::new(
         runtime.memory,
         runtime.statevector,
-        Some(histogram_builder.histogram()),
+        Some(histogram_builder.histogram),
+        Some(histogram_builder.stats),
     ))
 }

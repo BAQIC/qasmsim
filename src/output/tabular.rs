@@ -79,7 +79,7 @@ where
 
 fn print_memory<W>(
     buffer: &mut W,
-    memory: &HashMap<String, (u64, usize)>,
+    memory: &HashMap<String, (u64, usize, usize)>,
     options: &Options,
 ) -> fmt::Result
 where
