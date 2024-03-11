@@ -47,7 +47,7 @@ impl Default for Options {
             integer: true,
             statevector: true,
             probabilities: true,
-            times: true,
+            times: false,
             shots: None,
         }
     }
