@@ -225,7 +225,10 @@ fn test_measurements() {
     for (index, (source, expected_result)) in subtests.iter().enumerate() {
         let result = &qasmsim::run(source, None).unwrap();
         println!("Using source sample #{}", index);
-        assert_eq!(*result.memory().get("c").unwrap(), (*expected_result, 2));
+        assert_eq!(
+            *result.memory().get("c").unwrap(),
+            (*expected_result, 2, 68)
+        );
     }
 }
 
@@ -243,9 +246,9 @@ fn test_all_classical_memory_is_displayed() {
   ";
     let result = &qasmsim::run(source, None).unwrap();
     assert_eq!(result.memory().len(), 3);
-    assert_eq!(*result.memory().get("c").unwrap(), (0b11, 2));
-    assert_eq!(*result.memory().get("d").unwrap(), (0b0, 2));
-    assert_eq!(*result.memory().get("e").unwrap(), (0b0, 2));
+    assert_eq!(*result.memory().get("c").unwrap(), (0b11, 2, 56));
+    assert_eq!(*result.memory().get("d").unwrap(), (0b0, 2, 69));
+    assert_eq!(*result.memory().get("e").unwrap(), (0b0, 2, 82));
 }
 
 #[test]
@@ -263,8 +266,8 @@ fn test_conditional() {
   ";
     let result = &qasmsim::run(source, None).unwrap();
     assert_eq!(result.memory().len(), 2);
-    assert_eq!(*result.memory().get("c").unwrap(), (0b10, 2));
-    assert_eq!(*result.memory().get("d").unwrap(), (0b01, 2));
+    assert_eq!(*result.memory().get("c").unwrap(), (0b10, 2, 56));
+    assert_eq!(*result.memory().get("d").unwrap(), (0b01, 2, 69));
 }
 
 #[test]
@@ -290,16 +293,6 @@ fn test_print_json() {
     assert_eq!(
         output,
         r#"{
-  "Memory": {
-    "c": {
-      "0": {
-        "Bin value": "0b11",
-        "Hex value": "0x3",
-        "Int value": 3,
-        "Register length": 2
-      }
-    }
-  },
   "State": {
     "0": {
       "Imaginary": "0.000000",
@@ -324,4 +317,35 @@ fn test_print_json() {
   }
 }"#
     );
+}
+
+#[test]
+fn test_print_json_shots() {
+    let source = "
+    OPENQASM 2.0;
+    include \"qelib1.inc\";
+    qreg q[2];
+    creg c[2];
+    creg c1[2];
+    x q[0];
+    measure q -> c;
+    ";
+
+    let option = qasmsim::options::Options {
+        format: qasmsim::options::Format::Json,
+        shots: Some(1000),
+        times: false,
+        ..Default::default()
+    };
+
+    let result = qasmsim::run(source, option.shots).unwrap();
+    let output = qasmsim::print_result(&result, &option);
+    assert_eq!(
+        output,
+        r#"{
+  "Stats": {
+    "0001": 1000
+  }
+}"#
+    )
 }

@@ -23,17 +23,9 @@ where
 {
     let mut output = json!({});
     if options.shots.is_some() {
-        let histogram = result
-            .histogram()
-            .as_ref()
-            .expect("there is some histogram");
-        if !histogram.is_empty() {
-            print_histogram(&mut output, histogram, options)?;
-        }
-    } else {
-        let memory = result.memory();
-        if !memory.is_empty() {
-            print_memory(&mut output, memory, options)?;
+        let stats = result.stats().as_ref().expect("there is some histogram");
+        if !stats.is_empty() {
+            print_stats(&mut output, stats)?;
         }
     }
 
@@ -56,7 +48,7 @@ where
 
 fn print_memory(
     value: &mut Value,
-    memory: &HashMap<String, (u64, usize)>,
+    memory: &HashMap<String, (u64, usize, usize)>,
     options: &Options,
 ) -> fmt::Result {
     let histogram = HashMap::from_iter(
@@ -107,6 +99,14 @@ fn print_memory_summary(
             }
         }
     }
+
+    value["Memory"] = json;
+
+    Ok(())
+}
+
+fn print_stats(value: &mut Value, stats: &HashMap<String, usize>) -> fmt::Result {
+    let json = json!(stats);
 
     value["Memory"] = json;
 
