@@ -108,7 +108,7 @@ fn print_memory_summary(
 fn print_stats(value: &mut Value, stats: &HashMap<String, usize>) -> fmt::Result {
     let json = json!(stats);
 
-    value["Stats"] = json;
+    value["Memory"] = json;
 
     Ok(())
 }
