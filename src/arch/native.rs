@@ -25,7 +25,7 @@ macro_rules! measure {
 
 /// Register the milliseconds spent in parsing the program and simulating.
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct ExecutionTimes {
     parsing_time: u128,
     simulation_time: u128,
@@ -76,7 +76,7 @@ impl From<(u128, u128)> for ExecutionTimes {
 /// [`Computation`]: ./struct.Computation.html
 /// [time statistics]: ./struct.ExecutionTimes.html
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct Execution {
     statevector: StateVector,
     probabilities: Vec<f64>,

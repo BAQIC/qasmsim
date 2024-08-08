@@ -8,9 +8,6 @@ use std::convert;
 use std::error;
 use std::fmt;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
-
 use self::humanize::humanize_error;
 use crate::grammar::lexer::{self, Location, Tok};
 pub use crate::interpreter::runtime::RuntimeError;
@@ -67,7 +64,7 @@ pub type SrcAndErr<'src, E> = (&'src str, E);
 /// [`map_err`]: ../../std/result/enum.Result.html#method.map_err
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum QasmSimError<'src> {
     /// A generic unknown error.
     UnknownError(String),

@@ -8,8 +8,8 @@
 //! statements, and adding new features to the language would require the
 //! modification os certain layouts.
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+
+
 
 use crate::grammar::lexer::Location;
 
@@ -81,7 +81,7 @@ use crate::grammar::lexer::Location;
 /// };
 /// ```
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct OpenQasmProgram {
     /// The version of the language as in `X.Y`. Current supported version is
     /// `2.0`.
@@ -149,7 +149,7 @@ pub struct OpenQasmProgram {
 ///     ]
 /// };
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct OpenQasmLibrary {
     /// List of gate declarations. Although the type allows for the contruction
     /// of a library with arbitrary statements, this would not constitute a
@@ -186,7 +186,7 @@ pub struct OpenQasmLibrary {
 /// [`OpenQasmProgram`]: ./struct.OpenQasmProgram.html
 /// [`Statement`]: ./enum.Statement.html
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct BarrierPragma(pub Vec<Argument>);
 
 /// Each of the statements you can find in a OPENQASM program.
@@ -220,7 +220,7 @@ pub struct BarrierPragma(pub Vec<Argument>);
 /// [`OpenQasmProgram`]: ./struct.OpenQasmProgram.html
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum Statement {
     /// Quantum register declaration with name and size.
     QRegDecl(String, usize),
@@ -289,7 +289,7 @@ pub enum Statement {
 /// Right, now, only statements are tied to spans making impossible to
 /// accurately localize inner AST nodes.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct Span<S> {
     /// Pair of source locations where the AST node can be found.
     pub boundaries: (Location, Location),
@@ -309,7 +309,7 @@ pub struct Span<S> {
 /// [`OpenQasmLibrary`]: ./struct.OpenQasmLibrary.html
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum GateOperation {
     /// A gate invocation.
     Unitary(UnitaryOperation),
@@ -326,7 +326,7 @@ pub enum GateOperation {
 /// [`OpenQasmProgram`]: ./struct.OpenQasmProgram.html
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum QuantumOperation {
     /// A gate invocation.
     Unitary(UnitaryOperation),
@@ -349,7 +349,7 @@ pub enum QuantumOperation {
 /// [`OpenQasmProgram`]: ./struct.OpenQasmProgram.html
 /// [unitary]: https://en.wikipedia.org/wiki/Unitary_operator
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct UnitaryOperation(pub String, pub Vec<Expression>, pub Vec<Argument>);
 
 /// Any of the operators that can appear in an expression.
@@ -362,7 +362,7 @@ pub struct UnitaryOperation(pub String, pub Vec<Expression>, pub Vec<Argument>);
 /// [`OpenQasmLibrary`]: ./struct.OpenQasmLibrary.html
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum OpCode {
     /// Code for the addition operator `+`.
     Add,
@@ -379,7 +379,7 @@ pub enum OpCode {
 /// Any of the functions that can appear in an expression.
 #[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum FuncCode {
     /// Function sinus `sin`.
     Sin,
@@ -404,7 +404,7 @@ pub enum FuncCode {
 /// [`OpenQasmLibrary`]: ./struct.OpenQasmLibrary.html
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum Expression {
     /// The pi constant `pi`.
     Pi,
@@ -447,7 +447,7 @@ pub enum Expression {
 /// ```
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum Argument {
     /// An entire register like `q`.
     Id(String),
