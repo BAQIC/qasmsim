@@ -5,9 +5,6 @@ use std::collections::VecDeque;
 use std::fmt;
 use std::str::CharIndices;
 
-
-
-
 use lazy_static::lazy_static;
 use regex::Regex;
 

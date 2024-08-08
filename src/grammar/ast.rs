@@ -8,9 +8,6 @@
 //! statements, and adding new features to the language would require the
 //! modification os certain layouts.
 
-
-
-
 use crate::grammar::lexer::Location;
 
 /// Represent a OPENQASM program. A valid program contains a version string

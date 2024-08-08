@@ -1,5 +1,3 @@
-#![cfg(not(target_arch = "wasm32"))]
-
 use std::collections::HashMap;
 use std::convert;
 
@@ -11,6 +9,7 @@ use crate::interpreter::{Computation, Histogram};
 pub use api::get_gate_info;
 pub use api::parse_and_link;
 pub use api::simulate;
+pub use api::simulate_with_mode;
 pub use api::simulate_with_shots;
 
 macro_rules! measure {
@@ -187,6 +186,13 @@ pub fn run(input: &str, shots: Option<usize>) -> api::Result<'_, Execution> {
             Some(shots) => simulate_with_shots(&linked?, shots),
         }
     });
+    let out = out.map_err(|err| QasmSimError::from((input, err)));
+    Ok(Execution::from((out?, parsing_time, simulation_time)))
+}
+
+pub fn run_mode(input: &str, shots: usize, mode: String) -> api::Result<'_, Execution> {
+    let (linked, parsing_time) = measure!({ parse_and_link(input) });
+    let (out, simulation_time) = measure!({ simulate_with_mode(&linked?, shots, mode) });
     let out = out.map_err(|err| QasmSimError::from((input, err)));
     Ok(Execution::from((out?, parsing_time, simulation_time)))
 }
