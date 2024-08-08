@@ -2,8 +2,8 @@ use std::collections::HashMap;
 use std::error;
 use std::fmt;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+
+
 
 use crate::grammar::ast;
 use crate::grammar::lexer::Location;
@@ -11,7 +11,7 @@ use crate::grammar::lexer::Location;
 /// The different types for OPENQASM values.
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum QasmType {
     /// A generic register.
     Register,
@@ -39,7 +39,7 @@ impl fmt::Display for QasmType {
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum RegisterType {
     Q,
     C,
@@ -48,7 +48,7 @@ pub enum RegisterType {
 /// Represent the possible semantic errors.
 #[non_exhaustive]
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub enum SemanticError {
     /// Attempt to redefine an already defined register.
     RedefinitionError {

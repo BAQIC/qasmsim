@@ -1,8 +1,8 @@
 //! Contain utilities for representing the internal state of a quantum system.
 use std::f64;
 
-#[cfg(feature = "serde")]
-use serde::{Deserialize, Serialize};
+
+
 
 use float_cmp::ApproxEq;
 
@@ -13,7 +13,7 @@ use crate::random;
 
 /// Represent the state vector of a quantum system simulation.
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct StateVector {
     bases: Vec<Complex>,
     qubit_width: usize,

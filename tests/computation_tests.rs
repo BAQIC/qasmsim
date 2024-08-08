@@ -343,7 +343,7 @@ fn test_print_json_shots() {
     assert_eq!(
         output,
         r#"{
-  "Stats": {
+  "Memory": {
     "0001": 1000
   }
 }"#

@@ -19,7 +19,7 @@ pub type Histogram = HashMap<String, (Vec<(u64, usize)>, usize)>;
 /// [`simulate()`]: ./fn.simulate.html
 /// [`simulate_with_shots()`]: ./fn.simulate_with_shots.html
 #[derive(Debug, Clone, PartialEq)]
-#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
+
 pub struct Computation {
     statevector: StateVector,
     memory: HashMap<String, (u64, usize, usize)>,
