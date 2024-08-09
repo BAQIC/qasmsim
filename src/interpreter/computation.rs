@@ -25,6 +25,7 @@ pub struct Computation {
     memory: HashMap<String, (u64, usize, usize)>,
     probabilities: Vec<f64>,
     histogram: Option<Histogram>,
+    sequences: Option<Vec<String>>,
     stats: Option<HashMap<String, usize>>,
 }
 
@@ -36,6 +37,7 @@ impl Computation {
         memory: HashMap<String, (u64, usize, usize)>,
         statevector: StateVector,
         histogram: Option<Histogram>,
+        sequences: Option<Vec<String>>,
         stats: Option<HashMap<String, usize>>,
     ) -> Self {
         Computation {
@@ -43,6 +45,7 @@ impl Computation {
             statevector,
             memory,
             histogram,
+            sequences,
             stats,
         }
     }
@@ -67,6 +70,11 @@ impl Computation {
         &self.histogram
     }
 
+    /// Return the sequences when simulating with several shots.
+    pub fn sequences(&self) -> &Option<Vec<String>> {
+        &self.sequences
+    }
+
     /// Return the statistics when simulating with several shots.
     pub fn stats(&self) -> &Option<HashMap<String, usize>> {
         &self.stats
@@ -76,6 +84,7 @@ impl Computation {
 #[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub struct HistogramBuilder {
     pub histogram: Histogram,
+    pub sequences: Vec<String>,
     pub stats: HashMap<String, usize>,
 }
 
@@ -110,12 +119,30 @@ impl HistogramBuilder {
         *self.stats.entry(binary).or_insert(0) += 1;
     }
 
+    pub fn update_sequences(&mut self, memory: &HashMap<String, (u64, usize, usize)>) {
+        let mut memory_vec = memory.into_iter().collect::<Vec<_>>();
+        memory_vec.sort_by(|x, y| y.1 .2.cmp(&x.1 .2));
+        let mut binary = String::new();
+        for (_, current_value) in memory_vec {
+            binary.push_str(&format!(
+                "{:0width$b}",
+                current_value.0,
+                width = current_value.1
+            ));
+        }
+        self.sequences.push(binary);
+    }
+
     pub fn histogram(self) -> Histogram {
         self.histogram
     }
 
     pub fn stats(self) -> HashMap<String, usize> {
         self.stats
+    }
+
+    pub fn sequences(self) -> Vec<String> {
+        self.sequences
     }
 }
 

@@ -24,8 +24,32 @@ where
     let mut output = json!({});
     if options.shots.is_some() {
         let stats = result.stats().as_ref().expect("there is some histogram");
+        println!("{:?}", stats.is_empty());
         if !stats.is_empty() {
-            print_stats(&mut output, stats)?;
+            if options.mode == "aggregation" {
+                print_stats(&mut output, stats)?;
+            } else if options.mode == "min" || options.mode == "max" {
+                print_minmax(&mut output, stats, options)?;
+            } else {
+                panic!("Invalid mode");
+            }
+        } else if !result
+            .sequences()
+            .as_ref()
+            .expect("there is some sequences")
+            .is_empty()
+        {
+            if options.mode == "sequence" {
+                print_sequence(
+                    &mut output,
+                    result
+                        .sequences()
+                        .as_ref()
+                        .expect("there is some sequences"),
+                )?;
+            } else {
+                panic!("Invalid mode");
+            }
         }
     }
 
@@ -110,6 +134,29 @@ fn print_stats(value: &mut Value, stats: &HashMap<String, usize>) -> fmt::Result
 
     value["Memory"] = json;
 
+    Ok(())
+}
+
+fn print_sequence(value: &mut Value, sequences: &Vec<String>) -> fmt::Result {
+    let json = json!(sequences);
+
+    value["Sequences"] = json;
+
+    Ok(())
+}
+
+fn print_minmax(
+    value: &mut Value,
+    stats: &HashMap<String, usize>,
+    options: &Options,
+) -> fmt::Result {
+    if options.mode == "max" {
+        let max_state = stats.iter().max_by_key(|(_, &v)| v).unwrap();
+        value["Memory"] = json!({max_state.0: max_state.1});
+    } else {
+        let min_state = stats.iter().min_by_key(|(_, &v)| v).unwrap();
+        value["Memory"] = json!({min_state.0: min_state.1});
+    }
     Ok(())
 }
 

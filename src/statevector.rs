@@ -1,9 +1,6 @@
 //! Contain utilities for representing the internal state of a quantum system.
 use std::f64;
 
-
-
-
 use float_cmp::ApproxEq;
 
 use self::cached_fns::{build_u, find_exchangeable_rows, find_target_rows};

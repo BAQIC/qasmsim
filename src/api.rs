@@ -153,3 +153,5 @@ pub fn get_gate_info<'src>(
 pub use interpreter::runtime::simulate;
 
 pub use interpreter::runtime::simulate_with_shots;
+
+pub use interpreter::runtime::simulate_with_mode;

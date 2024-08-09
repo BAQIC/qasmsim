@@ -3,9 +3,6 @@ use std::error;
 use std::fmt;
 use std::hash::Hash;
 
-
-
-
 use crate::grammar::{ast, lexer::Location};
 use crate::interpreter::argument_solver::ArgumentSolver;
 use crate::interpreter::computation::{Computation, HistogramBuilder};
@@ -625,6 +622,7 @@ pub fn simulate(program: &ast::OpenQasmProgram) -> Result<Computation> {
         runtime.statevector,
         None,
         None,
+        None,
     ))
 }
 
@@ -683,6 +681,47 @@ pub fn simulate_with_shots(program: &ast::OpenQasmProgram, shots: usize) -> Resu
         runtime.memory,
         runtime.statevector,
         Some(histogram_builder.histogram),
+        Some(histogram_builder.sequences),
         Some(histogram_builder.stats),
     ))
+}
+
+pub fn simulate_with_mode(
+    program: &ast::OpenQasmProgram,
+    shots: usize,
+    mode: String,
+) -> Result<Computation> {
+    let semantics = extract_semantics(program)?;
+    let mut runtime = Runtime::new(semantics);
+    let mut histogram_builder = HistogramBuilder::new();
+
+    if mode == "sequence" {
+        for _ in 0..shots {
+            runtime.reset();
+            runtime.apply_gates(&program.program)?;
+            histogram_builder.update_sequences(&runtime.memory);
+        }
+        Ok(Computation::new(
+            runtime.memory,
+            runtime.statevector,
+            Some(histogram_builder.histogram),
+            Some(histogram_builder.sequences),
+            Some(histogram_builder.stats),
+        ))
+    } else if mode == "aggregation" || mode == "max" || mode == "min" {
+        for _ in 0..shots {
+            runtime.reset();
+            runtime.apply_gates(&program.program)?;
+            histogram_builder.update(&runtime.memory);
+        }
+        Ok(Computation::new(
+            runtime.memory,
+            runtime.statevector,
+            Some(histogram_builder.histogram),
+            None,
+            Some(histogram_builder.stats),
+        ))
+    } else {
+        Err(RuntimeError::Other)
+    }
 }

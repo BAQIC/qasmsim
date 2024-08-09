@@ -2,9 +2,6 @@ use std::collections::HashMap;
 use std::error;
 use std::fmt;
 
-
-
-
 use crate::grammar::ast;
 use crate::grammar::lexer::Location;
 

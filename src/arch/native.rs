@@ -1,5 +1,3 @@
-#![cfg(not(target_arch = "wasm32"))]
-
 use std::collections::HashMap;
 use std::convert;
 
@@ -11,6 +9,7 @@ use crate::interpreter::{Computation, Histogram};
 pub use api::get_gate_info;
 pub use api::parse_and_link;
 pub use api::simulate;
+pub use api::simulate_with_mode;
 pub use api::simulate_with_shots;
 
 macro_rules! measure {
@@ -82,6 +81,7 @@ pub struct Execution {
     probabilities: Vec<f64>,
     memory: HashMap<String, (u64, usize, usize)>,
     histogram: Option<Histogram>,
+    sequences: Option<Vec<String>>,
     times: ExecutionTimes,
     stats: Option<HashMap<String, usize>>,
 }
@@ -93,6 +93,7 @@ impl Execution {
         probabilities: Vec<f64>,
         memory: HashMap<String, (u64, usize, usize)>,
         histogram: Option<Histogram>,
+        sequences: Option<Vec<String>>,
         times: ExecutionTimes,
         stats: Option<HashMap<String, usize>>,
     ) -> Self {
@@ -101,6 +102,7 @@ impl Execution {
             probabilities,
             memory,
             histogram,
+            sequences,
             times,
             stats,
         }
@@ -126,6 +128,11 @@ impl Execution {
         &self.histogram
     }
 
+    /// Return the sequences when simulating with several shots.
+    pub fn sequences(&self) -> &Option<Vec<String>> {
+        &self.sequences
+    }
+
     /// Return the time spent in parsing and performing the simulation.
     pub fn times(&self) -> &ExecutionTimes {
         &self.times
@@ -145,6 +152,7 @@ impl convert::From<(Computation, u128, u128)> for Execution {
             probabilities: computation.probabilities().to_vec(),
             memory: computation.memory().clone(),
             histogram: computation.histogram().clone(),
+            sequences: computation.sequences().clone(),
             times: ExecutionTimes {
                 parsing_time,
                 simulation_time,
@@ -185,6 +193,19 @@ pub fn run(input: &str, shots: Option<usize>) -> api::Result<'_, Execution> {
         match shots {
             None => simulate(&linked?),
             Some(shots) => simulate_with_shots(&linked?, shots),
+        }
+    });
+    let out = out.map_err(|err| QasmSimError::from((input, err)));
+    Ok(Execution::from((out?, parsing_time, simulation_time)))
+}
+
+/// Parse and simulate the `input` OPENQASM program with `shots` and `mode`.
+pub fn run_mode(input: &str, shots: Option<usize>, mode: String) -> api::Result<'_, Execution> {
+    let (linked, parsing_time) = measure!({ parse_and_link(input) });
+    let (out, simulation_time) = measure!({
+        match shots {
+            None => simulate(&linked?),
+            Some(shots) => simulate_with_mode(&linked?, shots, mode),
         }
     });
     let out = out.map_err(|err| QasmSimError::from((input, err)));

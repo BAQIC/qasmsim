@@ -67,7 +67,7 @@ pub mod statevector;
 
 pub use crate::{
     arch::native::{
-        get_gate_info, parse_and_link, run, simulate, simulate_with_shots, Execution,
+        get_gate_info, parse_and_link, run, run_mode, simulate, simulate_with_shots, Execution,
         ExecutionTimes,
     },
     error::QasmSimError,
