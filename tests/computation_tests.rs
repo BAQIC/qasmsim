@@ -349,3 +349,74 @@ fn test_print_json_shots() {
 }"#
     )
 }
+
+#[test]
+fn test_print_json_shots_sequence() {
+    let source = "
+    OPENQASM 2.0;
+    include \"qelib1.inc\";
+    qreg q[2];
+    creg c[2];
+    creg c1[2];
+    x q[0];
+    measure q -> c;
+    ";
+
+    let option = qasmsim::options::Options {
+        format: qasmsim::options::Format::Json,
+        shots: Some(5),
+        times: false,
+        mode: "sequence".to_string(),
+        ..Default::default()
+    };
+
+    let result = qasmsim::run_mode(source, option.shots, option.mode.clone()).unwrap();
+    println!("{:?}", result);
+    let output = qasmsim::print_result(&result, &option);
+    assert_eq!(
+        output,
+        r#"{
+  "Sequences": [
+    "0001",
+    "0001",
+    "0001",
+    "0001",
+    "0001"
+  ]
+}"#
+    )
+}
+
+// TODO: add min and max test
+// #[test]
+// fn test_print_json_shots_max() {
+//     let source = "
+//     OPENQASM 2.0;
+//     include \"qelib1.inc\";
+//     qreg q[2];
+//     creg c[2];
+//     creg c1[2];
+//     h q[0];
+//     ry(1/4) q[0];
+//     measure q -> c;
+//     ";
+
+//     let option = qasmsim::options::Options {
+//         format: qasmsim::options::Format::Json,
+//         shots: Some(1000),
+//         times: false,
+//         mode: "max".to_string(),
+//         ..Default::default()
+//     };
+
+//     let result = qasmsim::run_mode(source, option.shots, option.mode.clone()).unwrap();
+//     let output = qasmsim::print_result(&result, &option);
+//     assert_eq!(
+//         output,
+//         r#"{
+//   "Memory": {
+//     "0000": xxx
+//   }
+// }"#
+//     )
+// }

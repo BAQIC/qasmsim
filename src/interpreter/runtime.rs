@@ -681,7 +681,7 @@ pub fn simulate_with_shots(program: &ast::OpenQasmProgram, shots: usize) -> Resu
         runtime.memory,
         runtime.statevector,
         Some(histogram_builder.histogram),
-        None,
+        Some(histogram_builder.sequences),
         Some(histogram_builder.stats),
     ))
 }
@@ -708,7 +708,7 @@ pub fn simulate_with_mode(
             Some(histogram_builder.sequences),
             Some(histogram_builder.stats),
         ))
-    } else if mode == "aggeration" || mode == "max" || mode == "min" {
+    } else if mode == "aggregation" || mode == "max" || mode == "min" {
         for _ in 0..shots {
             runtime.reset();
             runtime.apply_gates(&program.program)?;

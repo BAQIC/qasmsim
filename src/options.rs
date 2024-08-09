@@ -36,6 +36,9 @@ pub struct Options {
 
     /// Specify the number of simulations.
     pub shots: Option<usize>,
+
+    /// Specify the mode of return value
+    pub mode: String,
 }
 
 impl Default for Options {
@@ -49,6 +52,7 @@ impl Default for Options {
             probabilities: true,
             times: false,
             shots: None,
+            mode: "aggregation".to_string(),
         }
     }
 }
