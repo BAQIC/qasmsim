@@ -142,6 +142,11 @@ impl Execution {
     pub fn stats(&self) -> &Option<HashMap<String, usize>> {
         &self.stats
     }
+
+    /// Return the expectation value of the simulation.
+    pub fn expectation(&self) -> Vec<f64> {
+        self.statevector.expectation_values()
+    }
 }
 
 impl convert::From<(Computation, u128, u128)> for Execution {
