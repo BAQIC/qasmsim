@@ -87,6 +87,27 @@ impl StateVector {
         self.bases.iter().map(|c| c.norm_sqr()).collect()
     }
 
+    /// Perform a expectation value measurement on the Z-axis of the quantum state
+    pub fn expectation_values(&self) -> Vec<f64> {
+        let probabilities = self.probabilities();
+        let mut expectation_values = Vec::with_capacity(self.qubit_width);
+        for i in 0..self.qubit_width {
+            let mut sum = 0.0;
+            let mask = 1 << i;
+            for (index, probability) in probabilities.iter().enumerate() {
+                if (index & mask) != 0 {
+                    sum += probability;
+                } else {
+                    sum -= probability;
+                }
+            }
+            // deal with floating point errors, for zero and one
+            sum = f64::max(0.0, f64::min(1.0, sum));
+            expectation_values.push(sum);
+        }
+        expectation_values
+    }
+
     /// Reset the state-vector to the state |0⟩.
     pub fn reset(&mut self) {
         for amplitude in self.bases.iter_mut() {

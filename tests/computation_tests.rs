@@ -271,7 +271,7 @@ fn test_conditional() {
 }
 
 #[test]
-fn test_print_json() {
+fn test_print_json_1() {
     let source = "
     OPENQASM 2.0;
     include \"qelib1.inc\";
@@ -293,6 +293,10 @@ fn test_print_json() {
     assert_eq!(
         output,
         r#"{
+  "Expectations": [
+    "1.000000",
+    "1.000000"
+  ],
   "State": {
     "0": {
       "Imaginary": "0.000000",
@@ -313,6 +317,58 @@ fn test_print_json() {
       "Imaginary": "0.000000",
       "Probability": "1.000000",
       "Real": "1.000000"
+    }
+  }
+}"#
+    );
+}
+
+#[test]
+fn test_print_json_2() {
+    let source = "
+    OPENQASM 2.0;
+    include \"qelib1.inc\";
+    qreg q[2];
+    creg c[2];
+    h q;
+    ";
+
+    let option = qasmsim::options::Options {
+        format: qasmsim::options::Format::Json,
+        shots: None,
+        times: false,
+        ..Default::default()
+    };
+
+    let result = qasmsim::run(source, option.shots).unwrap();
+    let output = qasmsim::print_result(&result, &option);
+    assert_eq!(
+        output,
+        r#"{
+  "Expectations": [
+    "0.000000",
+    "0.000000"
+  ],
+  "State": {
+    "0": {
+      "Imaginary": "0.000000",
+      "Probability": "0.250000",
+      "Real": "0.500000"
+    },
+    "1": {
+      "Imaginary": "0.000000",
+      "Probability": "0.250000",
+      "Real": "0.500000"
+    },
+    "2": {
+      "Imaginary": "0.000000",
+      "Probability": "0.250000",
+      "Real": "0.500000"
+    },
+    "3": {
+      "Imaginary": "0.000000",
+      "Probability": "0.250000",
+      "Real": "0.500000"
     }
   }
 }"#

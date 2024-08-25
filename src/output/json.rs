@@ -189,6 +189,15 @@ fn print_state(
         }
     }
 
+    if options.statevector {
+        let format_vec: Vec<String> = statevector
+            .expectation_values()
+            .iter()
+            .map(|v| format!("{:.6}", v))
+            .collect();
+        value["Expectations"] = json!(format_vec);
+    }
+
     value["State"] = json;
 
     Ok(())
