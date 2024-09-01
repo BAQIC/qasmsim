@@ -2,6 +2,7 @@
 use std::f64;
 
 use float_cmp::ApproxEq;
+use num::complex::ComplexFloat;
 
 use self::cached_fns::{build_u, find_exchangeable_rows, find_target_rows};
 use crate::complex;
@@ -106,6 +107,28 @@ impl StateVector {
             expectation_values.push(sum);
         }
         expectation_values
+    }
+
+    /// perform observation on the quantum state and return the classical
+    /// outcomes.
+    pub fn observation(&self, spin_op: Vec<Vec<Complex>>) -> f64 {
+        // state_vector * spin_op
+        let mut temp = Vec::new();
+        for row in spin_op {
+            let mut outcome = Complex::new(0.0, 0.0);
+            for (index, amplitude) in self.bases.iter().enumerate() {
+                outcome += amplitude * row[index];
+            }
+            temp.push(outcome);
+        }
+        let mut expectation = Complex::new(0.0, 0.0);
+        for row in temp {
+            for amplitude in self.bases.iter() {
+                expectation += amplitude * row;
+            }
+        }
+
+        expectation.re()
     }
 
     /// Reset the state-vector to the state |0⟩.
