@@ -117,7 +117,7 @@ impl StateVector {
         for row in spin_op {
             let mut outcome = Complex::new(0.0, 0.0);
             for (index, amplitude) in self.bases.iter().enumerate() {
-                outcome += amplitude * row[index];
+                outcome += amplitude.conj() * row[index];
             }
             temp.push(outcome);
         }

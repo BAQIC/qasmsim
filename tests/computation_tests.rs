@@ -2,7 +2,7 @@
 
 extern crate qasmsim;
 
-use std::f64::consts::FRAC_1_SQRT_2;
+use std::{f64::consts::FRAC_1_SQRT_2, vec};
 
 use qasmsim::statevector::{assert_approx_eq, Complex, StateVector};
 
@@ -441,6 +441,55 @@ fn test_print_json_shots_sequence() {
   ]
 }"#
     )
+}
+
+#[test]
+fn test_observe() {
+    let source = "
+  OPENQASM 2.0;
+  include \"qelib1.inc\";
+  qreg q[2];
+  x q[0];
+  ry(0) q[1];
+  CX q[1], q[0];
+";
+
+    let option = qasmsim::options::Options {
+        format: qasmsim::options::Format::Json,
+        shots: None,
+        times: false,
+        ..Default::default()
+    };
+
+    let spin_op = vec![
+        vec![
+            Complex::new(0.00029, 0.0),
+            Complex::new(0.0, 0.0),
+            Complex::new(0.0, 0.0),
+            Complex::new(0.0, 0.0),
+        ],
+        vec![
+            Complex::new(0.0, 0.0),
+            Complex::new(-0.43629, 0.0),
+            Complex::new(-4.2866, 0.0),
+            Complex::new(0.0, 0.0),
+        ],
+        vec![
+            Complex::new(0.0, 0.0),
+            Complex::new(-4.2866, 0.0),
+            Complex::new(12.2503, 0.0),
+            Complex::new(0.0, 0.0),
+        ],
+        vec![
+            Complex::new(0.0, 0.0),
+            Complex::new(0.0, 0.0),
+            Complex::new(0.0, 0.0),
+            Complex::new(11.8137, 0.0),
+        ],
+    ];
+
+    let result = qasmsim::run(source, option.shots).unwrap();
+    // th result is -4.7228900000000005
 }
 
 // TODO: add min and max test
